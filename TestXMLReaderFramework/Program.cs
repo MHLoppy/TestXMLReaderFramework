@@ -51,7 +51,7 @@ namespace TestXMLReaderFramework
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error reading XML: {ex}");
+                    Console.WriteLine($"Error finding profile: {ex}");
                     //Environment.Exit(0);
                 }
 
@@ -192,7 +192,7 @@ namespace TestXMLReaderFramework
             }
             else
             {
-                senseThePresenceOfXmlNearby = false;
+                senseThePresenceOfXmlNearby = false; // this is surely not an efficient way of using a bool right? but I can't find an alternative in 3 minutes so it stays for now
             }
         }
 
