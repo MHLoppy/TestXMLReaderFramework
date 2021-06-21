@@ -3,6 +3,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 using System;
+using System.IO;
 using System.Xml;
 
 namespace TestXMLReaderFramework
@@ -12,72 +13,94 @@ namespace TestXMLReaderFramework
         public static string playerProfile = "";
         public static int cbpName = 0;
         public static string userName = "";
+        public static string currentUserXml = "";
+        public static bool senseThePresenceOfXmlNearby = false;
 
         static void Main(string[] args)
         {
             // surely there's a more efficient way of setting this up than row upon row of try/catch blocks?
 
-            try // Find Profile block
-            {
-                FindProfile();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error finding profile: {ex}");
-                Console.WriteLine($"Attempting to bypass HnZ curse with username substitution...");
+            CheckForFile();
 
-                try
+            if (senseThePresenceOfXmlNearby == true)
+            {
+                try // Find Profile block
                 {
-                    FindProfileEstonian();
+                    AssignUserName();
                 }
-                catch (Exception ex2)
+                catch (Exception ex)
                 {
-                    Console.WriteLine($"Sorry boss, shit's fucked up: {ex2}");
+                    Console.WriteLine($"Error finding profile: {ex}");
+                    Console.WriteLine($"Attempting to bypass HnZ curse by using substituted username...");
+
+                    try
+                    {
+                        AssignUserNameEstonian();
+                    }
+                    catch (Exception ex2)
+                    {
+                        Console.WriteLine($"Sorry boss, shit's fucked up: {ex2}");
+                        //Environment.Exit(0);
+                    }
                     //Environment.Exit(0);
                 }
-                //Environment.Exit(0);
-            }
 
-            try // Read XML block
-            {
-                ReadXml();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error reading XML: {ex}");
-                //Environment.Exit(0);
-            }
-
-            try // Check XML block
-            {
-                CheckXml();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error parsing XML: {ex}");
-                //Environment.Exit(0);
-            }
-
-            try // Write XML block
-            {
-                if (cbpName == 0)
+                try // Read XML block
                 {
-                    Console.WriteLine("Adding #ICON169 to last game name...");
-                    WriteXml();
+                    FindProfile();
                 }
-                else
+                catch (Exception ex)
                 {
-                    Console.WriteLine("Nothing to do...");
+                    Console.WriteLine($"Error reading XML: {ex}");
+                    //Environment.Exit(0);
+                }
+
+                try // Read XML block
+                {
+                    ReadXml();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error reading XML: {ex}");
+                    //Environment.Exit(0);
+                }
+
+                try // Check XML block
+                {
+                    CheckXml();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error parsing XML: {ex}");
+                    //Environment.Exit(0);
+                }
+
+                try // Write XML block
+                {
+                    if (cbpName == 0)
+                    {
+                        Console.WriteLine("Adding #ICON169 to last game name...");
+                        WriteXml();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Nothing to do...");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error updating XML: {ex}");
+                    //Environment.Exit(0);
                 }
             }
-            catch (Exception ex)
+
+            else if (senseThePresenceOfXmlNearby == false)
             {
-                Console.WriteLine($"Error updating XML: {ex}");
-                //Environment.Exit(0);
+                Console.WriteLine("Unable to acess current_user.xml");
             }
 
             Console.WriteLine();
-            Console.WriteLine("Main function finished. Press any key to continue...");
+            Console.WriteLine("Main function finished. Press ENTER to continue...");
             Console.ReadLine();
 
             ///*
@@ -88,32 +111,27 @@ namespace TestXMLReaderFramework
             ///
         }
 
-        static void FindProfile() // logic to find current user + their .dat file
+        static void AssignUserName() //separated logic from FindProfile to more eloquently deal with HnZ curse
         {
             userName = Environment.UserName;
-            string currentUser = @"C:\Users\" + userName + @"\AppData\Roaming\Microsoft Games\Rise of Nations\PlayerProfile\current_user.xml";
+        }
+
+        static void AssignUserNameEstonian() //same logic, but factors in ~Estonian~
+        {
+            userName = "Kasutaja"; //HnZcursed :HnZdead:
+        }
+
+        static void FindProfile() // logic to find current user + their .dat file
+        {
+            currentUserXml = @"C:\Users\" + userName + @"\AppData\Roaming\Microsoft Games\Rise of Nations\PlayerProfile\current_user.xml";
 
             XmlDocument doc = new XmlDocument();
-            doc.Load(currentUser);
+            doc.Load(currentUserXml);
             string ronName = doc.SelectSingleNode("ROOT/CURRENT_USER/@name").Value;
 
             playerProfile = @"C:\Users\" + userName + @"\AppData\Roaming\Microsoft Games\Rise of Nations\PlayerProfile\" + ronName + ".dat";
 
             Console.WriteLine("Windows username: " + userName);
-            Console.WriteLine("RoN username: " + ronName);
-        }
-        static void FindProfileEstonian() // logic to find current user + their .dat file, but ~estonian~
-        {
-            userName = "Kasutaja"; //HnZcursed :HnZdead:
-            string currentUser = @"C:\Users\" + userName + @"\AppData\Roaming\Microsoft Games\Rise of Nations\PlayerProfile\current_user.xml";
-
-            XmlDocument doc = new XmlDocument();
-            doc.Load(currentUser);
-            string ronName = doc.SelectSingleNode("ROOT/CURRENT_USER/@name").Value;
-
-            playerProfile = @"C:\Users\" + userName + @"\AppData\Roaming\Microsoft Games\Rise of Nations\PlayerProfile\" + ronName + ".dat";
-
-            Console.WriteLine("Windows username: " + userName + " (HnZ curse)");
             Console.WriteLine("RoN username: " + ronName);
         }
 
@@ -125,7 +143,7 @@ namespace TestXMLReaderFramework
             string name = xmlNode.InnerText;
 
             Console.WriteLine("Last game name: " + name);
-            Console.WriteLine("If this is correct, press any key to continue...");
+            Console.WriteLine("If this is correct, Press ENTER to continue...");
             Console.ReadLine();
         }
 
@@ -139,7 +157,7 @@ namespace TestXMLReaderFramework
             if (lastGameName.Contains("#ICON169") == true)
             {
                 cbpName = 1;
-                Console.WriteLine("Last game name already contains #ICON169. Press any key to continue...");
+                Console.WriteLine("Last game name already contains #ICON169. Press ENTER to continue...");
                 Console.ReadLine();
                 return;
             }
@@ -163,6 +181,20 @@ namespace TestXMLReaderFramework
             Console.WriteLine("New game name: " + xmlNode.InnerText);
         }
 
-        
+        static void CheckForFile()
+        {
+            userName = Environment.UserName;
+            currentUserXml = @"C:\Users\" + userName + @"\AppData\Roaming\Microsoft Games\Rise of Nations\PlayerProfile\current_user.xml";
+
+            if (File.Exists(currentUserXml))
+            {
+                senseThePresenceOfXmlNearby = true;
+            }
+            else
+            {
+                senseThePresenceOfXmlNearby = false;
+            }
+        }
+
     }
 }
