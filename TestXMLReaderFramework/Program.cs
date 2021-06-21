@@ -11,6 +11,7 @@ namespace TestXMLReaderFramework
     {
         public static string playerProfile = "";
         public static int cbpName = 0;
+        public static string userName = "";
 
         static void Main(string[] args)
         {
@@ -23,6 +24,17 @@ namespace TestXMLReaderFramework
             catch (Exception ex)
             {
                 Console.WriteLine($"Error finding profile: {ex}");
+                Console.WriteLine($"Attempting to bypass HnZ curse with username substitution...");
+
+                try
+                {
+                    FindProfileEstonian();
+                }
+                catch (Exception ex2)
+                {
+                    Console.WriteLine($"Sorry boss, shit's fucked up: {ex2}");
+                    //Environment.Exit(0);
+                }
                 //Environment.Exit(0);
             }
 
@@ -78,7 +90,7 @@ namespace TestXMLReaderFramework
 
         static void FindProfile() // logic to find current user + their .dat file
         {
-            string userName = Environment.UserName;
+            userName = Environment.UserName;
             string currentUser = @"C:\Users\" + userName + @"\AppData\Roaming\Microsoft Games\Rise of Nations\PlayerProfile\current_user.xml";
 
             XmlDocument doc = new XmlDocument();
@@ -88,6 +100,20 @@ namespace TestXMLReaderFramework
             playerProfile = @"C:\Users\" + userName + @"\AppData\Roaming\Microsoft Games\Rise of Nations\PlayerProfile\" + ronName + ".dat";
 
             Console.WriteLine("Windows username: " + userName);
+            Console.WriteLine("RoN username: " + ronName);
+        }
+        static void FindProfileEstonian() // logic to find current user + their .dat file, but ~estonian~
+        {
+            userName = "Kasutaja"; //HnZcursed :HnZdead:
+            string currentUser = @"C:\Users\" + userName + @"\AppData\Roaming\Microsoft Games\Rise of Nations\PlayerProfile\current_user.xml";
+
+            XmlDocument doc = new XmlDocument();
+            doc.Load(currentUser);
+            string ronName = doc.SelectSingleNode("ROOT/CURRENT_USER/@name").Value;
+
+            playerProfile = @"C:\Users\" + userName + @"\AppData\Roaming\Microsoft Games\Rise of Nations\PlayerProfile\" + ronName + ".dat";
+
+            Console.WriteLine("Windows username: " + userName + " (HnZ curse)");
             Console.WriteLine("RoN username: " + ronName);
         }
 
