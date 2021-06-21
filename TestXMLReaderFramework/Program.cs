@@ -23,7 +23,7 @@ namespace TestXMLReaderFramework
             catch (Exception ex)
             {
                 Console.WriteLine($"Error finding profile: {ex}");
-                Environment.Exit(0);
+                //Environment.Exit(0);
             }
 
             try // Read XML block
@@ -33,7 +33,7 @@ namespace TestXMLReaderFramework
             catch (Exception ex)
             {
                 Console.WriteLine($"Error reading XML: {ex}");
-                Environment.Exit(0);
+                //Environment.Exit(0);
             }
 
             try // Check XML block
@@ -43,7 +43,7 @@ namespace TestXMLReaderFramework
             catch (Exception ex)
             {
                 Console.WriteLine($"Error parsing XML: {ex}");
-                Environment.Exit(0);
+                //Environment.Exit(0);
             }
 
             try // Write XML block
@@ -61,7 +61,7 @@ namespace TestXMLReaderFramework
             catch (Exception ex)
             {
                 Console.WriteLine($"Error updating XML: {ex}");
-                Environment.Exit(0);
+                //Environment.Exit(0);
             }
 
             Console.WriteLine();
